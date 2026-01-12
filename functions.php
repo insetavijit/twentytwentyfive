@@ -164,3 +164,20 @@ if ( ! function_exists( 'twentytwentyfive_format_binding' ) ) :
 		}
 	}
 endif;
+
+// Registers custom blocks.
+if ( ! function_exists( 'twentytwentyfive_register_blocks' ) ) :
+	/**
+	 * Registers custom blocks for the theme.
+	 *
+	 * @since Twenty Twenty-Five 1.0
+	 *
+	 * @return void
+	 */
+	function twentytwentyfive_register_blocks() {
+		// Register the Recent Posts block.
+		register_block_type( get_template_directory() . '/blocks/recent-posts' );
+	}
+endif;
+add_action( 'init', 'twentytwentyfive_register_blocks' );
+

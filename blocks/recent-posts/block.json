@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "theme/recent-posts",
+    "version": "1.0.0",
+    "title": "Recent Posts",
+    "category": "widgets",
+    "icon": "list-view",
+    "description": "Display a list of recent post titles with optional dates.",
+    "supports": {
+        "html": false,
+        "color": {
+            "background": true,
+            "text": true,
+            "link": true
+        },
+        "spacing": {
+            "margin": true,
+            "padding": true
+        },
+        "typography": {
+            "fontSize": true,
+            "lineHeight": true
+        }
+    },
+    "attributes": {
+        "postsToShow": {
+            "type": "integer",
+            "default": 5
+        },
+        "showDate": {
+            "type": "boolean",
+            "default": true
+        },
+        "category": {
+            "type": "string",
+            "default": ""
+        },
+        "dateFormat": {
+            "type": "string",
+            "default": "M j, Y"
+        }
+    },
+    "textdomain": "twentytwentyfive",
+    "editorScript": "file:./index.js",
+    "render": "file:./render.php",
+    "style": "file:./style.css"
+}

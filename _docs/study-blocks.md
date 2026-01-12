@@ -1,6 +1,37 @@
 # Understanding WordPress Blocks
 
-This document explains how blocks work in WordPress, from the basic concepts to what happens under the hood when you edit and save content.
+## Document Summary
+
+WordPress blocks are the fundamental building units of modern WordPress content. Every piece of content—from paragraphs to complex layouts—is a block stored as HTML comments in the database. Blocks come in two types: **static blocks** save their HTML at edit time (fast, fixed), while **dynamic blocks** generate output via PHP on each page load (fresh data, slightly slower). WordPress core includes ~50 static blocks (Paragraph, Image, Group) and ~40 dynamic blocks (Site Title, Navigation, Post Content, Query Loop). Dynamic blocks both fetch AND display data—they return complete HTML, not raw data. Themes can arrange core blocks using **patterns** (reusable layouts) or create **custom blocks** when core functionality isn't enough. Understanding when to use core blocks vs custom blocks vs patterns is key to efficient theme development. This document covers block markup, storage, rendering, and provides a complete reference for core blocks.
+
+---
+
+## Table of Contents
+
+| Topic | Focus & Brief |
+|-------|---------------|
+| Quick Overview | Key terminology: blocks, markup, attributes, static vs dynamic |
+| What is a block? | Blocks as content units, LEGO analogy |
+| Block markup | HTML comment format: `<!-- wp:name {...} -->` |
+| Namespaces | How `core/` and custom namespaces work |
+| Attributes | Data storage in JSON and HTML |
+| Block storage | How blocks are saved in `wp_posts` table |
+| Page load rendering | Parsing → Block tree → Final HTML |
+| Static blocks | Saved HTML = output, fast but fixed |
+| Dynamic blocks | PHP renders on each load, fresh data |
+| Data AND Display | Dynamic blocks return complete HTML, not raw data |
+| Core Dynamic Block Reference | Tables: Site, Post, Query, Widget, Comment blocks |
+| Core Static Block Reference | Tables: Text, Media, Design blocks |
+| Template Part block | Loading header/footer from files |
+| Pattern block | Inserting reusable layouts |
+| Inner blocks | Nested blocks and container blocks |
+| Block supports | Color, spacing, typography features |
+| Block styles | Visual variations with CSS classes |
+| Block editor | React app, edit/save split |
+| Broken blocks | Validation errors and recovery |
+| Core vs Custom | Decision guide for when to create custom blocks |
+| Block categories | Organizing blocks in the editor |
+| Debugging | Common issues and fixes |
 
 ---
 
@@ -77,13 +108,13 @@ Notice the `/-->` at the end—no separate closing comment needed.
 
 Every block has a full name with a namespace:
 
-| Full Name | In Markup | Publisher |
-|-----------|-----------|-----------|
-| `core/paragraph` | `wp:paragraph` | WordPress core |
-| `core/image` | `wp:image` | WordPress core |
-| `core/template-part` | `wp:template-part` | WordPress core |
-| `woocommerce/cart` | `wp:woocommerce/cart` | WooCommerce |
-| `theme/custom` | `wp:theme/custom` | Your theme |
+| Full Name            | In Markup             | Publisher      |
+| -------------------- | --------------------- | -------------- |
+| `core/paragraph`     | `wp:paragraph`        | WordPress core |
+| `core/image`         | `wp:image`            | WordPress core |
+| `core/template-part` | `wp:template-part`    | WordPress core |
+| `woocommerce/cart`   | `wp:woocommerce/cart` | WooCommerce    |
+| `theme/custom`       | `wp:theme/custom`     | Your theme     |
 
 **The `core/` namespace** gets special treatment. In markup, you write just `wp:paragraph` instead of `wp:core/paragraph`. All other namespaces must be explicit.
 
@@ -255,6 +286,170 @@ function render_post_title_block($attributes) {
 
 ---
 
+## Dynamic Blocks: Data AND Display
+
+A common misconception: dynamic blocks don't just "return data"—they return **complete, ready-to-display HTML**.
+
+```
+Dynamic Block (e.g., wp:site-title)
+        ↓
+PHP render function runs
+        ↓
+Returns COMPLETE HTML
+        ↓
+<h1 class="wp-block-site-title"><a href="...">My Site</a></h1>
+```
+
+### What a block does:
+
+| Step | What Happens |
+|------|--------------|
+| 1. Fetch | Gets data from database/API |
+| 2. Process | Applies attributes (level, style, etc.) |
+| 3. Format | Wraps in proper HTML elements |
+| 4. Style | Adds CSS classes |
+| 5. Return | Outputs complete HTML string |
+
+**Example: `wp:site-title`**
+
+Input in template:
+```html
+<!-- wp:site-title {"level":1} /-->
+```
+
+Output to browser:
+```html
+<h1 class="wp-block-site-title">
+    <a href="https://mysite.com">My Site Name</a>
+</h1>
+```
+
+The block handles everything—you don't need to style or wrap it yourself.
+
+---
+
+## Core Dynamic Blocks Reference
+
+WordPress includes many built-in dynamic blocks. These work in ANY theme—no custom code needed.
+
+### Site Blocks
+
+| Block | Markup | What It Fetches |
+|-------|--------|-----------------|
+| Site Title | `wp:site-title` | Name from Settings → General |
+| Site Tagline | `wp:site-tagline` | Tagline from Settings → General |
+| Site Logo | `wp:site-logo` | Logo from Customizer |
+| Login/Logout | `wp:loginout` | Current user state |
+
+### Post Blocks
+
+| Block | Markup | What It Fetches |
+|-------|--------|-----------------|
+| Post Title | `wp:post-title` | Current post's title |
+| Post Content | `wp:post-content` | Current post's body |
+| Post Excerpt | `wp:post-excerpt` | Current post's excerpt |
+| Post Featured Image | `wp:post-featured-image` | Current post's thumbnail |
+| Post Date | `wp:post-date` | Publish date |
+| Post Author | `wp:post-author` | Author info + avatar |
+| Post Author Name | `wp:post-author-name` | Just author display name |
+| Post Author Bio | `wp:post-author-biography` | Author bio |
+| Post Terms | `wp:post-terms` | Categories or tags |
+
+### Navigation
+
+| Block | Markup | What It Fetches |
+|-------|--------|-----------------|
+| Navigation | `wp:navigation` | Menu structure |
+| Page List | `wp:page-list` | All published pages |
+
+### Query Blocks
+
+| Block | Markup | What It Fetches |
+|-------|--------|-----------------|
+| Query Loop | `wp:query` | Post collection |
+| Post Template | `wp:post-template` | Iterates posts |
+| Query Pagination | `wp:query-pagination` | Pagination state |
+| Query Title | `wp:query-title` | Archive title |
+
+### Widget Blocks
+
+| Block | Markup | What It Fetches |
+|-------|--------|-----------------|
+| Latest Posts | `wp:latest-posts` | Recent posts query |
+| Latest Comments | `wp:latest-comments` | Recent comments |
+| Archives | `wp:archives` | Date-based links |
+| Categories | `wp:categories` | Category list |
+| Tag Cloud | `wp:tag-cloud` | Tag list |
+| Calendar | `wp:calendar` | Post calendar |
+| RSS | `wp:rss` | External feed |
+| Search | `wp:search` | Search form |
+
+### Comment Blocks
+
+| Block | Markup | What It Fetches |
+|-------|--------|-----------------|
+| Comments | `wp:comments` | Full comment section |
+| Comment Template | `wp:comment-template` | Single comment |
+| Comment Author | `wp:comment-author-name` | Commenter name |
+| Comment Date | `wp:comment-date` | Comment timestamp |
+| Comment Content | `wp:comment-content` | Comment text |
+| Comments Form | `wp:post-comments-form` | Add comment form |
+
+### Template Blocks
+
+| Block | Markup | What It Fetches |
+|-------|--------|-----------------|
+| Template Part | `wp:template-part` | Header/footer file |
+| Pattern | `wp:pattern` | Pattern content |
+
+---
+
+## Core Static Blocks Reference
+
+Static blocks save their HTML at edit time. No PHP runs on page load.
+
+### Text Blocks
+
+| Block | Markup | Purpose |
+|-------|--------|---------|
+| Paragraph | `wp:paragraph` | Basic text |
+| Heading | `wp:heading` | H1-H6 titles |
+| List | `wp:list` | Bulleted/numbered lists |
+| Quote | `wp:quote` | Blockquote |
+| Code | `wp:code` | Code snippet |
+| Preformatted | `wp:preformatted` | Fixed-width text |
+| Pullquote | `wp:pullquote` | Styled quote callout |
+| Verse | `wp:verse` | Poetry formatting |
+| Table | `wp:table` | Data table |
+| Details | `wp:details` | Collapsible content |
+
+### Media Blocks
+
+| Block | Markup | Purpose |
+|-------|--------|---------|
+| Image | `wp:image` | Single image |
+| Gallery | `wp:gallery` | Image grid |
+| Audio | `wp:audio` | Audio player |
+| Video | `wp:video` | Video player |
+| Cover | `wp:cover` | Image with overlay |
+| File | `wp:file` | Download link |
+| Media & Text | `wp:media-text` | Side-by-side layout |
+
+### Design Blocks
+
+| Block | Markup | Purpose |
+|-------|--------|---------|
+| Group | `wp:group` | Container |
+| Columns | `wp:columns` | Multi-column |
+| Column | `wp:column` | Single column |
+| Buttons | `wp:buttons` | Button group |
+| Button | `wp:button` | Clickable button |
+| Separator | `wp:separator` | Horizontal divider |
+| Spacer | `wp:spacer` | Vertical space |
+| Social Links | `wp:social-links` | Social icons |
+
+---
+
 ## What is a Template Part block?
 
 ```html
@@ -277,7 +472,7 @@ Template Part is a special dynamic block that:
 | `theme` | Which theme to load from (defaults to active) |
 | `tagName` | Output element (div, header, footer, aside) |
 | `area` | Template part area (header, footer, uncategorized) |
----
+
 ### Under the hood flow:
 
 ```
@@ -518,62 +713,45 @@ Template HTML must exactly match block expectations. A misplaced space or wrong 
 
 ---
 
-## Block categories in Twenty Twenty-Five
+## When to Use Core Blocks vs Custom Blocks
 
-The theme organizes its blocks and patterns into categories:
+| Use Core Block When... | Create Custom Block When... |
+|------------------------|----------------------------|
+| WordPress has the functionality | Core blocks can't do it |
+| You just need to arrange blocks | You need custom PHP logic |
+| Content is static/user-editable | Data changes on each page load |
+| You want automatic updates | You need specific behavior |
 
-| Category | Examples |
-|----------|----------|
-| `text` | Paragraph, Heading, List |
-| `media` | Image, Gallery, Video |
-| `design` | Group, Columns, Cover, Spacer |
-| `widgets` | Search, Latest Posts, Navigation |
-| `theme` | Template Part, Post Title, Post Content |
-| `embed` | YouTube, Twitter, Vimeo |
+**Decision flow:**
 
-Theme patterns are categorized separately:
-- `featured` — Homepage-ready patterns
-- `query` — Post list patterns
-- `footer` — Footer patterns
-- `header` — Header patterns
+```
+Does a core block exist?
+├── Yes → Use it (maybe in a pattern)
+└── No → Can you combine core blocks?
+    ├── Yes → Create a pattern
+    └── No → Create a custom block
+```
 
 ---
 
-## Core block reference for themes
+## Block Categories
 
-These blocks appear frequently in Twenty Twenty-Five templates:
+The editor organizes blocks into categories:
 
-### Structural Blocks
+| Category | Blocks |
+|----------|--------|
+| `text` | Paragraph, Heading, List, Quote |
+| `media` | Image, Gallery, Video, Cover |
+| `design` | Group, Columns, Buttons, Spacer |
+| `widgets` | Search, Latest Posts, Categories |
+| `theme` | Template Part, Post Title, Navigation |
+| `embed` | YouTube, Twitter, Vimeo |
 
-| Block | Markup | Purpose |
-|-------|--------|---------|
-| Template Part | `wp:template-part` | Include header/footer |
-| Pattern | `wp:pattern` | Include pattern |
-| Group | `wp:group` | Container for blocks |
-| Row | `wp:group` + flex layout | Horizontal layout |
-| Stack | `wp:group` + flex layout | Vertical layout |
-
-### Content Blocks
-
-| Block | Markup | Purpose |
-|-------|--------|---------|
-| Post Title | `wp:post-title` | Display post/page title |
-| Post Content | `wp:post-content` | Display post/page body |
-| Post Excerpt | `wp:post-excerpt` | Display excerpt |
-| Post Featured Image | `wp:post-featured-image` | Display thumbnail |
-| Post Date | `wp:post-date` | Display publish date |
-| Post Author | `wp:post-author` | Display author info |
-| Post Terms | `wp:post-terms` | Display categories/tags |
-
-### Query Blocks
-
-| Block | Markup | Purpose |
-|-------|--------|---------|
-| Query | `wp:query` | Wrapper for post loop |
-| Post Template | `wp:post-template` | Template for each post |
-| Query Pagination | `wp:query-pagination` | Navigation links |
-| Query Title | `wp:query-title` | Archive title |
-| Query No Results | `wp:query-no-results` | Empty state |
+Theme patterns have separate categories:
+- `featured` — Homepage-ready patterns
+- `query` — Post list patterns
+- `header` — Header patterns
+- `footer` — Footer patterns
 
 ---
 
@@ -614,6 +792,25 @@ When troubleshooting template issues:
 <!-- wp:paragraph -->
 <div>Text</div>
 <!-- /wp:paragraph -->
+```
+
+---
+
+## Summary: Static vs Dynamic
+
+```
+STATIC BLOCKS                    DYNAMIC BLOCKS
+├── Paragraph                    ├── Site Title
+├── Heading                      ├── Navigation
+├── Image                        ├── Post Title
+├── Button                       ├── Post Content
+├── Group                        ├── Latest Posts
+├── Columns                      ├── Query Loop
+└── ~30 more                     └── ~40 more
+    ↓                                ↓
+Saved HTML = Output              PHP runs = Output
+    ↓                                ↓
+Fast, fixed                      Slower, fresh data
 ```
 
 ---
