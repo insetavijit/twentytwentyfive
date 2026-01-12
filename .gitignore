@@ -1,6 +1,7 @@
 # Dependencies
 /node_modules/
 /vendor/
+_docs/.obsidian/
 
 # Composer
 composer.phar
@@ -21,6 +22,7 @@ desktop.ini
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+_docs/.obsidian/
 .idea/
 *.sublime-project
 *.sublime-workspace
