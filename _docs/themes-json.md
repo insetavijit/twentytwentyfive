@@ -52,22 +52,28 @@ Every `theme.json` starts with schema and version declarations:
 
 ## Core Sections Overview
 
-```mermaid
-graph TD
-    A[theme.json] --> B[settings]
-    A --> C[styles]
-    A --> D[templateParts]
-    A --> E[customTemplates]
-    A --> F[patterns]
-    
-    B --> B1[color]
-    B --> B2[typography]
-    B --> B3[spacing]
-    B --> B4[layout]
-    
-    C --> C1[Global Styles]
-    C --> C2[Block Styles]
-    C --> C3[Element Styles]
+```
+                              ┌─────────────┐
+                              │ theme.json  │
+                              └──────┬──────┘
+           ┌──────────┬───────┬──────┴──────┬──────────────┐
+           ▼          ▼       ▼             ▼              ▼
+     ┌──────────┐ ┌────────┐ ┌─────────────┐ ┌───────────────┐ ┌──────────┐
+     │ settings │ │ styles │ │templateParts│ │customTemplates│ │ patterns │
+     └────┬─────┘ └───┬────┘ └─────────────┘ └───────────────┘ └──────────┘
+          │           │
+    ┌─────┴─────┐  ┌──┴───────────────┐
+    ▼     ▼     ▼  ▼         ▼        ▼
+┌───────┐│┌─────┐┌──────────┐┌──────────┐┌──────────────┐
+│ color ││spacing││Global    ││Block     ││Element       │
+│       ││      ││Styles    ││Styles    ││Styles        │
+└───────┘│└─────┘└──────────┘└──────────┘└──────────────┘
+┌────────────┐
+│ typography │
+└────────────┘
+┌────────┐
+│ layout │
+└────────┘
 ```
 
 ---
@@ -518,12 +524,27 @@ templates/
 
 Understanding the cascade of styles in WordPress:
 
-```mermaid
-graph TB
-    A[WordPress Core Defaults] --> B[theme.json Settings/Styles]
-    B --> C[Child Theme theme.json]
-    C --> D[User Global Styles<br/>Site Editor customizations]
-    D --> E[Final Rendered Styles]
+```
+┌───────────────────────────────┐
+│   WordPress Core Defaults     │
+└───────────────┬───────────────┘
+                ▼
+┌───────────────────────────────┐
+│  theme.json Settings/Styles   │
+└───────────────┬───────────────┘
+                ▼
+┌───────────────────────────────┐
+│     Child Theme theme.json    │
+└───────────────┬───────────────┘
+                ▼
+┌───────────────────────────────┐
+│      User Global Styles       │
+│  (Site Editor customizations) │
+└───────────────┬───────────────┘
+                ▼
+┌───────────────────────────────┐
+│    Final Rendered Styles      │
+└───────────────────────────────┘
 ```
 
 > [!IMPORTANT]
