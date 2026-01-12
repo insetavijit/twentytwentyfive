@@ -1,4 +1,5 @@
 {
+    "editor.wordWrap": "on",
     "intelephense.environment.includePaths": [
         "vendor/php-stubs/wordpress-stubs"
     ],
