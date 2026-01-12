@@ -1,0 +1,60 @@
+{
+    "intelephense.environment.includePaths": [
+        "vendor/php-stubs/wordpress-stubs"
+    ],
+    "intelephense.stubs": [
+        "apache",
+        "bcmath",
+        "Core",
+        "ctype",
+        "curl",
+        "date",
+        "dom",
+        "fileinfo",
+        "filter",
+        "gd",
+        "hash",
+        "iconv",
+        "intl",
+        "json",
+        "libxml",
+        "mbstring",
+        "mysql",
+        "mysqli",
+        "openssl",
+        "pcre",
+        "PDO",
+        "Phar",
+        "readline",
+        "Reflection",
+        "session",
+        "SimpleXML",
+        "soap",
+        "SPL",
+        "sqlite3",
+        "standard",
+        "tokenizer",
+        "xml",
+        "xmlreader",
+        "xmlwriter",
+        "zip",
+        "zlib"
+    ],
+    "[php]": {
+        "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+    },
+    "files.associations": {
+        "theme.json": "json"
+    },
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "theme.json"
+            ],
+            "url": "https://schemas.wp.org/wp/6.7/theme.json"
+        }
+    ],
+    "emmet.includeLanguages": {
+        "php": "html"
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "name": "dev/twentytwentyfive",
+    "type": "wordpress-theme",
+    "require-dev": {
+        "php-stubs/wordpress-stubs": "^6.9"
+    }
+}
