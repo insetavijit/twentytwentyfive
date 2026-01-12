@@ -1,0 +1,40 @@
+# Dependencies
+/node_modules/
+/vendor/
+
+# Composer
+composer.phar
+
+# Build outputs (optional - uncomment if you don't want to commit minified CSS)
+# style.min.css
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE/Editor
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Local environment
+.env
+.env.local
+*.local
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+
+# WordPress specific
+*.sql
+*.sql.gz
